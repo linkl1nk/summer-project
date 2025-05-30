@@ -33,8 +33,8 @@ def pendulum(L, h, g=9.8, theta0=0.1745):  # theta0 default ~10° in radians
 
     for i in range(1, num_steps):
         alpha_eu = -(g / L) * np.sin(theta_eu[i-1])  # Angular acceleration (rad/s²)
-        omega_eu[i] = omega_eu[i-1] + alpha_eu * (t[i] - t[i-1])  # Explicit Euler step
-        theta_eu[i] = theta_eu[i-1] + omega_eu[i-1] * (t[i] - t[i-1])
+        omega_eu[i] = omega_eu[i-1] + alpha_eu * h  # Explicit Euler step
+        theta_eu[i] = theta_eu[i-1] + omega_eu[i-1] * h
 
     # ========================================================================
     # 3. RK4 Method (reference solution)
