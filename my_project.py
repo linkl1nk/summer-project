@@ -12,7 +12,7 @@ def pendulum(L, h, g=9.8, theta0=0.1745):  # theta0 default ~10° in radians
     
     # Simulation duration (4 periods of small-angle approximation)
     small_angle_period = 2 * np.pi * np.sqrt(L / g)
-    t_max = 4 * small_angle_period  
+    t_max = 100 * small_angle_period  
     num_steps = int(t_max / h) + 1  # Ensure integer number of steps
     t = np.linspace(0, t_max, num_steps)  # Time array with linspace
 
@@ -74,7 +74,7 @@ def pendulum(L, h, g=9.8, theta0=0.1745):  # theta0 default ~10° in radians
 
     # ========================================================================
     # Visualization
-    plt.figure(figsize=(14, 10))
+    plt.figure(figsize=(10,8))
 
     # Trajectory plot (convert to Cartesian coordinates)
     plt.subplot(2, 1, 1)
@@ -82,9 +82,9 @@ def pendulum(L, h, g=9.8, theta0=0.1745):  # theta0 default ~10° in radians
     circle_theta = np.linspace(-np.pi, np.pi, 100)
     plt.plot(L * np.sin(circle_theta), -L * np.cos(circle_theta), 'k--', alpha=0.3, label='Ideal path')
     # Solutions
-    plt.plot(L * np.sin(theta_exact), -L * np.cos(theta_exact), 'b-', label='Exact (RK4)')
-    plt.plot(L * np.sin(theta_sa), -L * np.cos(theta_sa), 'g--', label='Small angle')
-    plt.plot(L * np.sin(theta_eu), -L * np.cos(theta_eu), 'r-.', label='Euler method')
+    plt.plot(L * np.sin(theta_exact), -L * np.cos(theta_exact), 'b-', label='RK4')
+    #plt.plot(L * np.sin(theta_sa), -L * np.cos(theta_sa), 'g--', label='Small angle')
+    #plt.plot(L * np.sin(theta_eu), -L * np.cos(theta_eu), 'r-.', label='Euler method')
     plt.plot([0, 0], [-L*1.1, L*0.1], 'k-', alpha=0.5)  # Pivot line
     plt.scatter(0, 0, c='k', marker='o', s=50)  # Pivot point
     plt.xlabel('x (m)')
@@ -97,20 +97,22 @@ def pendulum(L, h, g=9.8, theta0=0.1745):  # theta0 default ~10° in radians
     # Energy plot
     plt.subplot(2, 1, 2)
     energy_exact = 0.5 * (L * omega_exact)**2 + g * L * (1 - np.cos(theta_exact))
-    energy_sa = 0.5 * (L * omega_dot_sa)**2 + g * L * (1 - np.cos(theta_sa))
+    #energy_sa = 0.5 * (L * omega_dot_sa)**2 + g * L * (1 - np.cos(theta_sa))
     energy_eu = 0.5 * (L * omega_eu)**2 + g * L * (1 - np.cos(theta_eu))
     
-    plt.plot(t, energy_exact, 'b-', label='Exact (RK4)')
+    plt.plot(t, energy_exact, 'b-', label='RK4')
     plt.plot(t, energy_sa, 'g--', label='Small angle')
-    plt.plot(t, energy_eu, 'r-.', label='Euler method')
+    plt.plot(t, energy_eu, '-.', label='Euler method')
     plt.xlabel('Time (s)')
     plt.ylabel('Total energy (J/kg)')
     plt.title('Energy conservation comparison')
     plt.legend()
     plt.grid(True)
 
+    plt.ylim(0, 1.5 * energy_exact[0])
+
     plt.tight_layout()
     plt.show()
 
 # Example usage (direct radians input):
-pendulum(L=1.0, h=0.0001, theta0=np.pi/50) 
+pendulum(L=1.0, h=0.001, theta0=np.pi/4) 

@@ -58,7 +58,7 @@ def pendulum(L, h, T, theta0, g= 9.8):
     energy_sym = 0.5 * (L * omega_sym)**2 + g * L * (1 - np.cos(theta_sym))
 
     # Plotting results
-    plt.figure(figsize=(12, 10))
+    plt.figure(figsize=(10, 8))
 
     # Plot 1: Real trajectory of the pendulum (theta -> x, y)
     plt.subplot(2, 2, 1)
@@ -105,7 +105,7 @@ def pendulum(L, h, T, theta0, g= 9.8):
     plt.show()
 
 # Example of how to run the simulation
-pendulum(L=1.0, h=0.01, T=10.0, theta0=np.pi/4,g=9.8)
+pendulum(L=1.0, h=0.001, T=10, theta0=np.pi/4,g=9.8)
     
 
     
