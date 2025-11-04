@@ -74,4 +74,4 @@ def simulate_pendulum(L=1.0, h=0.01, T=10.0, theta0=np.pi/4):
 
 # Example of how to run the simulation
 if __name__ == "__main__":
-    simulate_pendulum(L=1.0, h=0.01, T=10.0, theta0=np.pi/4)
+    simulate_pendulum(L=1.0, h=0.001, T=10.0, theta0=np.pi/4)
