@@ -1,46 +1,81 @@
-# Numerical Simulation of a Pendulum
+# Pendulum ODE: A Reflection on Numerical Solvers
 
-This project was completed as part of the UCL Summer Project (2025). It explores and compares various numerical methods for simulating the motion of a simple pendulum, which is a classic non-linear dynamical system.
+This project began as a UCL Summer Project to compare numerical methods for solving the pendulum ODE. It has been extended into a reflection on the "correct" choice of algorithm, balancing short-term accuracy, long-term stability, and computational complexity.
 
----
-
-## 1. Project Goal
-
-The primary goal is to solve the pendulum's ordinary differential equation (ODE) and compare the results of different numerical integrators. The key metrics for comparison are:
-* **Accuracy:** How close the simulation stays to a known analytical solution (e.g., the small-angle approximation or a high-precision RK4 solution).
-* **Stability & Energy Conservation:** How the numerical solution behaves over long time periods, particularly whether it artificially gains or loses energy.
+This project's narrative argues that for physical simulations, "structure-preserving" algorithms (like Symplectic Euler) are often superior to "high-accuracy" algorithms (like RK4), especially over long time horizons.
 
 ---
 
-## 2. Core Methods Implemented
+## Project Narrative & Key Analyses
 
-This project implements and analyzes the following integrators:
+This repository is organized around a central narrative. The scripts in the `analysis/` folder are numbered to follow this "story."
 
-1.  **Small-Angle Approximation (Analytical Solution)**
-    * **File:** `small_angel.py` (You may want to rename this to `small_angle.py`)
-    * **Description:** The exact analytical solution for the *linearized* ODE ($\sin(\theta) \approx \theta$). This serves as a baseline for comparison at small initial angles.
+### Act 0: The Limit of Linearization
+* **Script:** `analysis/plot_00_linear_approx.py`
+* **Goal:** Justify why numerical methods are needed.
+* **Analysis:** Compares the analytical "small angle" solution (sin(θ) ≈ θ) against the high-accuracy RK4 solver.
+* **Finding:** The approximation holds for small angles (e.g., 18°) but fails significantly at larger angles (e.g., 30°), proving we must solve the full non-linear ODE.
 
-2.  **Explicit Euler Method**
-    * **File:** `...` (Which file implements this? `pendulum.py` perhaps?)
-    * **Description:** A basic, first-order numerical method. It is simple to implement but known for its instability and failure to conserve energy.
+### Act 1: The 3 Eulers - A Search for Stability
+* **Script:** `analysis/plot_01_euler_comparison.py`
+* **Goal:** Compare the three base Euler methods.
+* **Analysis:** Uses Energy Plots and Phase Portraits to compare Explicit, Implicit, and Symplectic Euler.
+* **Finding:** Explicit Euler is unstable (gains energy). Implicit Euler is "damped" (loses energy). Symplectic Euler is the only one that conserves energy (oscillates around the true value), making it the "winner" for physical simulation.
+* **Evidence:** `plot_02_implicit_stability.py` (proves Implicit loses energy long-term) and `plot_03_symplectic_stability.py` (proves Symplectic conserves energy long-term).
 
-3.  **Symplectic Euler Method (or Semi-Implicit Euler)**
-    * **File:** `symplectic_euler.py`
-    * **Description:** A first-order method that is popular in physics. It is designed to (almost) conserve the system's energy over long simulations, making it far more stable than the explicit Euler method.
+### Act 2: The Reflection - RK4 vs. Symplectic
+* **Script:** `analysis/plot_04_rk4_reflection.py`
+* **Goal:** A deeper reflection comparing the "best" Euler (Symplectic) against the "gold standard" (RK4).
+* **Analysis:** Runs a long-term simulation (`T=200`) with a large step-size (`h=0.05`).
+* **Finding:** This reveals the core reflection of the project:
+    1.  The **Trajectory Plot** becomes a useless, overlapping mess.
+    2.  The **Phase Portrait** is the *only* tool that shows the truth: `RK4` (non-symplectic) slowly drifts and spirals away (energy drift). `Symplectic Euler` (structure-preserving) remains perfectly stable and bounded.
+    3.  **Conclusion:** `RK4` wins on short-term accuracy, but `Symplectic Euler` wins on long-term stability.
 
-4.  **(Other Methods - Help me identify these)**
-    * **File:** `newton.py`
-        * **Description:** `...` (What does this file do? Does it use Newton's method to solve something? Or is it related to the `Newton.py` file in the original project?)
-    * **File:** `phase_2.py`
-        * **Description:** `...` (Does this plot the "phase space" or "phase diagram" of the pendulum? i.e., plotting angular velocity `omega` vs. angle `theta`?)
+### Explorations
+* **Script:** `scratchpad/newton_method_exploration.py`
+* **Purpose:** A "learning note" exploring how Newton's Method works from scratch. This was done to understand the `scipy.fsolve` solver used by the Implicit Euler method.
 
 ---
 
-## 3. How to Set Up and Run
+## Project Structure
 
-This project requires Python and standard scientific libraries.
+* `main.py`: A simple "dashboard" script that runs all 3 Euler methods and plots the 4-panel comparison.
+* `src/solvers.py`: **The Single Source of Truth.** Contains all core solver functions (Euler, RK4, small_angle).
+* `analysis/`: Contains all the specialized, "publication-ready" plots for the narrative.
+* `scratchpad/`: Contains early drafts and learning explorations (like `newton.py`).
+* `requirements.txt`: A list of all Python dependencies.
+* `.gitignore`: Configured to ignore `.venv/` and `__pycache__/`.
 
-**1. Clone the repository:**
-```bash
-git clone [https://github.com/linkl1nk/summer-project.git](https://github.com/linkl1nk/summer-project.git)
-cd summer-project
+---
+
+## How to Run
+
+1.  Clone the repository and `cd` into it.
+2.  Create and activate a virtual environment:
+    ```bash
+    python3 -m venv .venv
+    source .venv/bin/activate
+    ```
+3.  Install dependencies:
+    ```bash
+    pip install -r requirements.txt
+    ```
+4.  Run the main dashboard:
+    ```bash
+    python main.py
+    ```
+5.  Run a specific analysis from the narrative:
+    ```bash
+    python analysis/plot_01_euler_comparison.py
+    ```
+
+---
+
+## Future Work
+
+This project's structure is now clean, but the analysis is not yet complete.
+
+* [ ] **Refactor Imports:** The scripts in `analysis/` still need to be fully refactored to `import` their solvers from `src/solvers.py`.
+* [ ] **Parameter Tuning:** The `analysis/` plots (especially `plot_04_rk4_reflection.py`) need their `h` and `T` parameters carefully "tuned" to ensure their trends are "not blurry" and persuasively demonstrate the scientific argument.
+* [ ] **Big O Analysis:** Add a formal Big O complexity analysis to this README, comparing the computational cost of each method (e.g., `Implicit` vs. `Symplectic`).
